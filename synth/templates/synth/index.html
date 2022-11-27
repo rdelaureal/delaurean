@@ -1,0 +1,147 @@
+{% extends "synth/layout.html" %}
+{% load static %}
+
+{% block body %}
+<div id="synthesizer">
+    <div id="modules">
+        <div class="module" id="oscillator">
+            <h3 class="module-display-name">oscillator</h3>
+            <div class="module-controls" id="oscillator-types">
+                <input type="radio" id="sine" name="oscillators" value="sine">
+                <label for="sine">Sine</label>   
+                <input type="radio" id="square" name="oscillators" value="square" checked>
+                <label for="square">Square</label>
+                <input type="radio" id="sawtooth" name="oscillators" value="sawtooth">
+                <label for="sawtooth">Sawtooth</label>    
+                <input type="radio" id="triangle" name="oscillators" value="triangle">
+                <label for="triangle">Triangle</label>   
+            </div>       
+        </div>
+        <div class="module" id="filter">
+            <h3 class="module-display-name">filter</h3>
+            <div class="module-controls" id="filter-cutoff">
+                <input type="range" id="cutoff" name="cutoff" min="0" max="10000" value="5000" step="1">
+                <label for="cutoff">Cutoff</label>
+            </div>
+            <div class="module-controls" id="filter-types">
+                <input type="radio" id="lowpass" name="filter-type" value="lowpass" checked>
+                <label for="lowpass">Lowpass</label>
+                <input type="radio" id="highpass" name="filter-type" value="highpass">
+                <label for="highpass">Highpass</label>
+                <input type="radio" id="bandpass" name="filter-type" value="bandpass">
+                <label for="highpass">Bandpass</label>
+            </div>
+        </div>
+        <div class="module" id="envelope">
+            <h3 class="module-display-name">amp EG</h3>
+            <div class="module-controls">
+                <input type="range" id="attack" name="attack" min="0" max="1" value=".1" step=".1" >
+                <label for="attack">Attack</label>
+                <input type="range" id="release" name="release" min="0" max="1" value=".3" step=".1" >
+                <label for="release">Release</label>
+            </div>
+        </div>
+        <div class="module" id="lfo">
+            <h3 class="module-display-name">LFO</h3>
+            <div class="module-controls">
+                <select name="lfo-type" id="lfo-type">
+                    <option value="sine" selected>Sine</option>
+                    <option value="square">Square</option>
+                    <option value="sawtooth">Sawtooth</option>
+                    <option value="triangle">Triangle</option>
+                </select>    
+                <input type="range" id="lfo-hz" name="lfo-hz" min="0" max="20" value="0" step="1">
+                <label for="lfo-hz">Frequency</label> 
+            </div>
+        </div>
+        <div class="module" id="utilities">
+            <div class="module-controls">
+                <input type="range" id="volume" name="volume" min="0" max="1" value=".5" step=".1" >
+                <label for="volume">Volume</label>
+                <div id="display-note-div">
+                    <span class="dispay-util" id="display-note">X</span>
+                    <span>Note</span>
+                </div>
+                <div id="display-note-div">
+                    <span class="dispay-util" id="display-freq">000.00</span>
+                    <span>Freq</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="keyboard">
+        <div class="key white" data-note="C4">
+            <div class="note">z</div>
+        </div>
+        <div class="key black" data-note="C#4">
+            <div class="note">s</div>
+        </div>
+        <div class="key white" data-note="D4">
+            <div class="note">x</div>
+        </div>
+        <div class="key black" data-note="D#4">
+            <div class="note">d</div>
+        </div>
+        <div class="key white" data-note="E4">
+            <div class="note">c</div>
+        </div>
+        <div class="key white" data-note="F4">
+            <div class="note">v</div>
+        </div>
+        <div class="key black" data-note="F#4">
+            <div class="note">g</div>
+        </div>
+        <div class="key white" data-note="G4">
+            <div class="note">b</div>
+        </div>
+        <div class="key black" data-note="G#4">
+            <div class="note">h</div>
+        </div>
+        <div class="key white" data-note="A4">
+            <div class="note">n</div>
+        </div>
+        <div class="key black" data-note="A#4">
+            <div class="note">j</div>
+        </div>
+        <div class="key white" data-note="B4">
+            <div class="note">m</div>
+        </div>
+        <div class="key white" data-note="C5">
+            <div class="note">,</div>
+        </div>
+        <div class="key black" data-note="C#5">
+            <div class="note">l</div>
+        </div>
+        <div class="key white" data-note="D5">
+            <div class="note">.</div>
+        </div>
+        <div class="key black" data-note="D#5">
+            <div class="note">;</div>
+        </div>
+        <div class="key white" data-note="E5">
+            <div class="note">/</div>
+        </div>
+    </div>
+    <div id="buttons">
+        <button id="reset-button">reset</button>
+        {% if user.is_authenticated %}
+        <div id="load-preset">
+            <select name="presets" id="presets">
+                <option value="blank"></option>
+                {% for preset in presets %}
+                <option value="{{ preset.title }}">{{ preset.title }}</option>
+                {% endfor %}
+            </select>    
+        </div>
+        <button id="load-preset-button">load preset</button>
+        <button id="save-preset-button">save preset</button>
+        {% else %}
+        <p id="unauthMSG">Log in or <a href="{% url 'register' %}">register</a> to save presets</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'synth/synth.js' %}"></script>
+{% endblock %}
