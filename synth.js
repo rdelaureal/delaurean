@@ -152,7 +152,9 @@ function synth() {
     keys = document.querySelectorAll('.key');
     keys.forEach(key => {
         key.addEventListener('pointerdown', keyPress);
+        key.addEventListener('pointerover', keyPress);
         key.addEventListener('pointerup', keyRelease);
+        key.addEventListener('pointerleave', keyRelease);
     })
 
     // listen for (computer) keyboard events
@@ -185,53 +187,70 @@ function play(freq) {
 
 // trigger play function when key is pressed
 function keyPress(event) {
-    console.log(event.type);
-    let note = null;
-    if (event.type === 'pointerdown') {
-        note = event.target.dataset['note'];
-    } else if (event.type === 'keydown') {
-        note = keymap[event.key];
+    if (event.buttons != 0) {
+        console.log(event.type);
+        console.log(event.buttons);
+
+        let note = null;
+
+        if (event.type === 'pointerdown' || event.type === 'pointerover') {
+            note = event.target.dataset['note'];
+        } else if (event.type === 'keydown') {
+            note = keymap[event.key];
+        }
+    
+        // change key color while pressed
+        let key = document.querySelector(`[data-note="${note}"]`);
+        key.style.backgroundColor = 'paleturquoise';
+    
+        // play tone
+        if (!key.dataset["pressed"]) {
+            oscillators[note] = play(freqs[note]);
+            console.log(oscillators);
+            key.dataset["pressed"] = "yes";
+        }
+    
+        // display last note pressed
+        const freq = freqs[note].toFixed(2);
+        noteDisplay.innerText = note;
+        freqDisplay.innerText = freq.toString();    
     }
-    oscillators[note] = play(freqs[note]);
-    console.log(oscillators)
-
-    // change key color while pressed
-    let key = document.querySelector(`[data-note="${note}"]`);
-    key.style.backgroundColor = 'paleturquoise';
-
-    // display last note pressed
-    const freq = freqs[note].toFixed(2);
-    noteDisplay.innerText = note;
-    freqDisplay.innerText = freq.toString();
 }
 
 // stop tone when key is released
 function keyRelease(event) {
     let note = null;
-    if (event.type === 'pointerup') {
+
+    if (event.type === 'pointerup' || event.type === 'pointerleave') {
         note = event.target.dataset['note'];
     } else if (event.type === 'keyup') {
         note = keymap[event.key];
     }
-    
-    // set release envelope
-    ampEG.gain.cancelScheduledValues(audioContext.currentTime);
-    ampEG.gain.linearRampToValueAtTime(0, audioContext.currentTime + releaseTime);
 
-    // stop oscillator
-    osc = oscillators[note]
-    osc.stop(audioContext.currentTime + releaseTime);
-
-    delete oscillators[note];
-
-    // change key color back to normal
+    // get key
     let key = document.querySelector(`[data-note="${note}"]`);
-    if (key.classList.contains('white')) {
-        key.style.backgroundColor = 'white';
-    } else if (key.classList.contains('black')) {
-        key.style.backgroundColor = 'black';
-    }
 
+    if (key.dataset["pressed"]) {
+
+        // set release envelope
+        ampEG.gain.cancelScheduledValues(audioContext.currentTime);
+        ampEG.gain.linearRampToValueAtTime(0, audioContext.currentTime + releaseTime);
+
+        // stop oscillator
+        osc = oscillators[note]
+        osc.stop(audioContext.currentTime + releaseTime);
+
+        delete oscillators[note];
+
+        // change key color back to normal
+        if (key.classList.contains('white')) {
+            key.style.backgroundColor = 'white';
+        } else if (key.classList.contains('black')) {
+            key.style.backgroundColor = 'black';
+        }
+
+        delete key.dataset["pressed"];
+    }
 }
 
 // change the volume
