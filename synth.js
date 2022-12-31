@@ -151,8 +151,8 @@ function synth() {
     // get keyboard keys and add event listeners
     keys = document.querySelectorAll('.key');
     keys.forEach(key => {
-        key.addEventListener('mousedown', keyPress);
-        key.addEventListener('mouseup', keyRelease);
+        key.addEventListener('pointerdown', keyPress);
+        key.addEventListener('pointerup', keyRelease);
     })
 
     // listen for (computer) keyboard events
@@ -187,7 +187,7 @@ function play(freq) {
 function keyPress(event) {
     console.log(event.type);
     let note = null;
-    if (event.type === 'mousedown') {
+    if (event.type === 'pointerdown') {
         note = event.target.dataset['note'];
     } else if (event.type === 'keydown') {
         note = keymap[event.key];
@@ -208,7 +208,7 @@ function keyPress(event) {
 // stop tone when key is released
 function keyRelease(event) {
     let note = null;
-    if (event.type === 'mouseup') {
+    if (event.type === 'pointerup') {
         note = event.target.dataset['note'];
     } else if (event.type === 'keyup') {
         note = keymap[event.key];
