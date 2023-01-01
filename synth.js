@@ -27,6 +27,7 @@ let selectedOsc = null;
 let LFO = null;
 let LFOtype = null;
 let LFOfreq = null;
+let LFOcompressor = null;
 
 // utility variables
 let noteDisplay = null;
@@ -135,7 +136,14 @@ function synth() {
 
     // initialize LFO
     LFO = audioContext.createOscillator();
-    LFO.connect(mainGain.gain);
+    LFOcompressor = audioContext.createDynamicsCompressor();
+    LFOcompressor.connect(mainGain.gain)
+    LFOcompressor.threshold.setValueAtTime(-50, audioContext.currentTime);
+    LFOcompressor.knee.setValueAtTime(30, audioContext.currentTime);
+    LFOcompressor.ratio.setValueAtTime(12, audioContext.currentTime);
+    LFOcompressor.attack.setValueAtTime(0, audioContext.currentTime);
+    LFOcompressor.release.setValueAtTime(0.25, audioContext.currentTime);
+    LFO.connect(LFOcompressor);
     setLFO();
     LFOtype.addEventListener('change', setLFO);
     LFOfreq.addEventListener('change', setLFO);
@@ -213,7 +221,7 @@ function keyPress(event) {
         // display last note pressed
         const freq = freqs[note].toFixed(2);
         noteDisplay.innerText = note;
-        freqDisplay.innerText = freq.toString();    
+        freqDisplay.innerText = freq.toString();
     }
 }
 
